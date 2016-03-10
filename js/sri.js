@@ -1,4 +1,16 @@
 
+// var ptNeighborhoods = {
+//   "Hazelwood": [40.397137, 40.425043, -79.954435, -79.923252],
+//   "Lawrenceville": 
+// }
+
+// var lvNeighborhoods = {
+//   "North Las Vegas": [36.195446, 36.334702, -115.206899, -114.967393],
+//   "Downtown": [36.159622, 36.181393, -115.151431, -115.115212],
+
+// }
+
+
 d3.csv("/dataset/ptbusiness.csv", function(err, data) {
   if (err) throw error;
 
@@ -52,18 +64,36 @@ function drawMap(data){
       }
   }
 
-  for (var i = 0; i < data.length; i++){
-    var lat = data[i]["latitude"];
-    var long = data[i]["longitude"];
+  // for (var i = 0; i < data.length; i++){
+  //   var lat = data[i]["latitude"];
+  //   var long = data[i]["longitude"];
 
-    var marker = L.marker([lat, long], {
-        icon: L.mapbox.marker.icon({
-          'marker-color': '#CD6889',
-        })
-    });
+  //   var marker = L.marker([lat, long], {
+  //       icon: L.mapbox.marker.icon({
+  //         'marker-color': '#CD6889',
+  //       })
+  //   });
 
-    marker.setOpacity(.1)
-    marker.addTo(map);
-  }
+  //   marker.setOpacity(.1)
+  //   marker.addTo(map);
+  // }
 
+//'marker-symbol': 'post', 
+
+    var markers = new L.MarkerClusterGroup();
+
+    for (var i = 0; i < data.length; i++) {
+        var lat = data[i]["latitude"];
+        var long = data[i]["longitude"];
+
+        var title = data[i]["name"];
+        var marker = L.marker(new L.LatLng(lat, long), {
+            icon: L.mapbox.marker.icon({'marker-color': '0044FF'}),
+            title: title
+        });
+        marker.bindPopup(title);
+        markers.addLayer(marker);
+    }
+
+    map.addLayer(markers);
 }
