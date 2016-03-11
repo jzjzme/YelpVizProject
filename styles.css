@@ -1,6 +1,7 @@
 body { 
 	margin:0; 
 	padding:0; 
+	font-family: Avenir Next;
 }
 
 #map { 
@@ -9,8 +10,4 @@ body {
 	bottom:15%; 
 	left: 10%; 
 	width:70%; 
-}
-
-#title {
-	font-family: Avenir Next;
 }
