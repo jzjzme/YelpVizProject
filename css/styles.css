@@ -1,0 +1,13 @@
+body { 
+	margin:0; 
+	padding:0; 
+	font-family: Avenir Next;
+}
+
+#map { 
+	position:absolute; 
+	top:15%;
+	bottom:15%; 
+	left: 10%; 
+	width:70%; 
+}
