@@ -1,231 +1,374 @@
 
+d3.csv('data/tip_data/tip.csv', function(err, tipData){
+d3.csv('data/user_data/new_user.csv', function(err, userData){  
+d3.csv("data/biz_data/WI_Business_Data.csv", function(err, dataWI) {
+d3.csv("data/biz_data/AZ_Business_Data.csv", function(err, dataAZ) {
+d3.csv("data/biz_data/Vegas_Biz_Data.csv", function(err, dataVegas) {
+d3.csv("data/biz_data/IL_Business_Data.csv", function(err, dataIL) {
+d3.csv("data/biz_data/PA_Business_Data.csv", function(err, dataPA) {
+d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
+  if (err) throw error;
 
+  //initialize map & features
+  L.mapbox.accessToken = 'pk.eyJ1Ijoic3JpOTYiLCJhIjoiY2lsZ2JwaDNmMmM5ZXZubWNzdzQ1NmJ0NSJ9._NbPwArBh8O9HKpmWsHOMg';
+  var geocoder = L.mapbox.geocoder('mapbox.places'),
+      map = L.mapbox.map('map', 'examples.map-h67hf2ic');
 
+  var markers;
+  var featureGroup;
+  var drawControl;
+  var initialized = false;
 
-// d3.csv('data/userdata/xaa.csv', function(err, userData1){
-// d3.csv('data/userdata/xab.csv', function(err, userData2){
-// d3.csv('data/userdata/xac.csv', function(err, userData3){
-// d3.csv('data/userdata/xad.csv', function(err, userData4){
-// d3.csv('data/userdata/xae.csv', function(err, userData5){
-// d3.csv('data/userdata/xaf.csv', function(err, userData6){
-// d3.csv('data/userdata/xag.csv', function(err, userData7){
-// d3.csv('data/userdata/xah.csv', function(err, userData8){
-// d3.csv('data/userdata/xai.csv', function(err, userData9){
-// d3.csv('data/userdata/xaj.csv', function(err, userData10){
-// d3.csv('data/userdata/xak.csv', function(err, userData11){
-// d3.csv('data/userdata/xal.csv', function(err, userData12){
-// d3.csv('data/userdata/xam.csv', function(err, userData13){
-// d3.csv("data/WI_Business_Data.csv", function(err, dataWI) {
-// d3.csv("data/AZ_Business_Data.csv", function(err, dataAZ) {
-// d3.csv("data/Vegas_Biz_Data.csv", function(err, dataVegas) {
-// d3.csv("data/IL_Business_Data.csv", function(err, dataIL) {
-// d3.csv("data/PA_Business_Data.csv", function(err, dataPA) {
-//   if (err) throw error;
-
-//   //initialize map & features
-//   L.mapbox.accessToken = 'pk.eyJ1Ijoic3JpOTYiLCJhIjoiY2lsZ2JwaDNmMmM5ZXZubWNzdzQ1NmJ0NSJ9._NbPwArBh8O9HKpmWsHOMg';
-//   var geocoder = L.mapbox.geocoder('mapbox.places'),
-//       map = L.mapbox.map('map', 'examples.map-h67hf2ic');
-
-//   var markers;
-//   var featureGroup;
-//   var drawControl;
-//   var initialized = false;
-
-//   //data to visualize
-//   var cityToggle = ["Las Vegas, NV", "Urbana-Champaign, IL", "Phoenix, AZ", "Madison, WI", "Pittsburgh, PA"];
-//   var dataToggle = [dataVegas, dataIL, dataAZ, dataWI, dataPA];
+  //variable initialization
+  var cityToggle = ["Las Vegas, NV", "Urbana-Champaign, IL", "Phoenix, AZ", "Madison, WI", "Pittsburgh, PA", "Charlotte, NC"];
+  var dataToggle = [dataVegas, dataIL, dataAZ, dataWI, dataPA, dataNC];
   
-//   var currentCity = cityToggle[4];
-//   var data = dataToggle[4];
-//   $('#cityTitle').html(currentCity);
-
-//   drawMap(data, currentCity);
-
-//   $('#ratingFilter').on('click', function(){
-//       var stars = $('#ratingInput').val();
-//       var starFilterData = [];
-//       var count = 0;
-//       for (var i = 0; i < data.length; i++) {
-//         if (data[i]["stars"] >= stars){
-//           starFilterData[count] = data[i];
-//           count++;
-//         }
-//       }
-
-//       map.removeLayer(markers);
-//       drawMap(starFilterData, currentCity);
-//   });
-
-//   $('.cityToggle').on('click', function(){
-//     currentCity = cityToggle[this.id];
-//     data = dataToggle[this.id];
-//     $('#cityTitle').html(currentCity);
-
-//     $('#avgRatingForSelection').html('');
-//     map.removeLayer(markers);
-//     drawMap(data, currentCity);
-//   })
-
-//   function drawMap(data, currentCity){
-
-//     geocoder.query(currentCity, showMap);
-
-//     function showMap(err, data) {
-//         // The geocoder can return an area, like a city, or a
-//         // point, like an address. Here we handle both cases,
-//         // by fitting the map bounds to an area or zooming to a point.
-//         if (data.lbounds) {
-//             map.fitBounds(data.lbounds);
-//         } else if (data.latlng) {
-//             map.setView([data.latlng[0], data.latlng[1]], 15);
-//         }
-//     }
-
-//     markers = new L.MarkerClusterGroup();
-
-//     for (var i = 0; i < data.length; i++) {
-//         var lat = data[i]["latitude"];
-//         var long = data[i]["longitude"];
-
-//         var title = data[i]["name"] + data[i]["stars"];
-//         var marker = L.marker(new L.LatLng(lat, long), {
-//             icon: L.mapbox.marker.icon({'marker-color': '0044FF'}),
-//             title: title
-//         });
-//         marker.bindPopup(title);
-//         markers.addLayer(marker);
-//     }
-
-//     map.addLayer(markers);
-
-//     featureGroup = L.featureGroup().addTo(map);
-
-//     drawControl = new L.Control.Draw({
-//       edit: {
-//         featureGroup: featureGroup
-//       },
-//       draw: {
-//         polygon: false,
-//         polyline: false,
-//         rectangle: true,
-//         circle: false,
-//         marker: false
-//       }
-//     });
-
-//     if (!initialized){
-//       drawControl.addTo(map);
-//       initialized = true;
-//     }
-
-//     map.on('draw:created', showPolygonArea);
-//     map.on('draw:edited', showPolygonAreaEdited);
-
-//     function showPolygonAreaEdited(e) {
-//       e.layers.eachLayer(function(layer) {
-//         showPolygonArea({ layer: layer });
-//       });
-//     }
-
-//     function showPolygonArea(e) {
-//       var minLat = e.layer._latlngs[0]["lat"];
-//       var maxLat = e.layer._latlngs[1]["lat"];
-//       var minLong = e.layer._latlngs[1]["lng"];
-//       var maxLong = e.layer._latlngs[2]["lng"];
-
-//       var avgStars = getAvgStarByArea(data, minLat, maxLat, minLong, maxLong);
-
-//       $('#avgRatingForSelection').html(avgStars);
-
-//       featureGroup.clearLayers();
-//       featureGroup.addLayer(e.layer);
-
-//       e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
-//       e.layer.openPopup();
-//     }
-//   }
-
-//   function getAvgStarByArea(data, minLat, maxLat, minLong, maxLong){
-//     var avgStars;
-//     var count = 0;
-//     for (var i = 0; i < data.length; i++){
-//       var lat = Number(data[i]["latitude"]);
-//       var long = Number(data[i]["longitude"]);
-//       var stars = Number(data[i]["stars"]);
-//       if (lat > minLat && lat <= maxLat && long > minLong && long <= maxLong){
-//         if (avgStars == null) avgStars = stars;
-//         else avgStars = (avgStars*count + stars)/(count + 1);
-//         count++;
-//       }
-//     }
-
-//     return avgStars;
-//   }      
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-// });
-
-var userLocations = {
-  "NV": {},
-  "IL": {},
-  "AZ": {},
-  "WI": {},
-  "PA": {},
-};
-
-d3.csv('../dataset/tip.csv', function(err, tipData){
-  for (var i = 0; i < tipData; i++){
-    
-    var biz_id = userData1[i]["business_id"];
-    var businessDataArray = [dataVegas, dataIL, dataAZ, dataWI, dataPA];
-    var businessFound = false;
-    var index = 0;
-    var biz_state = "";
-    while(biz_state == "" || index == businessDataArray.length){
-      biz_state = findBusinessStateFromTip(biz_id, businessDataArray[index]);
-      index++;
-    }
-
-    var userDataArray = [userData1, userData2, userData3, userData4, userData5, userData6, userData6, userData7, userData8, userData9, userData10, userData11, userData12, userData13];
-    var userFoundFlag = false;
-    var index = 0;
-    
-    while(!userFoundFlag){
-      foundFlag = findUserWhoTipped(userDataArray[index]);
-      index++;
-    }
-
+  var userLocations =  {};
+  for (var i = 0; i < cityToggle.length; i++){
+    var city = cityToggle[i];
+    var state = city.substring(city.length-2, city.length);
+    userLocations[state] = {};
   }
+  var userTipPathObj = {};
+  var indexOfCity = 4;
+  var currentCity = cityToggle[indexOfCity];
+  var data = dataToggle[indexOfCity];
+  $('#cityTitle').html(currentCity);
+
+  /* INITIAL FUNCTION CALLS */
+  drawMap(data, currentCity);
+  buildUserLocationsObj();
+  var topUsers = getTopUsersByCity();
+  showTopUsers(topUsers);
+
+  // console.log(userLocations)
+  // console.log(topUsers);
+  // console.log(userTipPathObj)
+  //console.log(tipData[0])
+
+  /* JQUERY FUNCTIONS */
+  $('#ratingFilter').on('click', function(){
+      var stars = $('#ratingInput').val();
+      var starFilterData = [];
+      var count = 0;
+      for (var i = 0; i < data.length; i++) {
+        if (data[i]["stars"] >= stars){
+          starFilterData[count] = data[i];
+          count++;
+        }
+      }
+
+      map.removeLayer(markers);
+      drawMap(starFilterData, currentCity);
+  });
+
+  $('.cityToggle').on('click', function(){
+    indexOfCity = this.id;
+    currentCity = cityToggle[indexOfCity];
+    data = dataToggle[indexOfCity];
+    $('#cityTitle').html(currentCity);
+
+    $('#avgRatingForSelection').html('');
+    map.removeLayer(markers);
+    drawMap(data, currentCity);
+    $("#topUsers").empty();
+    showTopUsers(topUsers);
+  })
+
+  $('#topUsers > li').on('click', function(){
+    $('#avgRatingForSelection').html('');
+    map.removeLayer(markers);
+    showTipLocationAnimation(this.id, userTipPathObj);
+  })
+
+  /* DATA ANALYSIS FUNCTIONS */
+  function drawMap(data, currentCity){
+
+    geocoder.query(currentCity, showMap);
+
+    function showMap(err, data) {
+        // The geocoder can return an area, like a city, or a
+        // point, like an address. Here we handle both cases,
+        // by fitting the map bounds to an area or zooming to a point.
+        if (data.lbounds) {
+            map.fitBounds(data.lbounds);
+        } else if (data.latlng) {
+            map.setView([data.latlng[0], data.latlng[1]], 20);
+            //map.setView([29, -26], 2);
+
+        }
+    }
+
+    markers = new L.MarkerClusterGroup();
+
+    for (var i = 0; i < data.length; i++) {
+        var lat = data[i]["latitude"];
+        var long = data[i]["longitude"];
+
+        var title = data[i]["name"] + data[i]["stars"];
+        var marker = L.marker(new L.LatLng(lat, long), {
+            icon: L.mapbox.marker.icon({'marker-color': '0044FF'}),
+            title: title
+        });
+        marker.bindPopup(title);
+        markers.addLayer(marker);
+    }
+
+    map.addLayer(markers);
+
+    featureGroup = L.featureGroup().addTo(map);
+
+    drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: featureGroup
+      },
+      draw: {
+        polygon: false,
+        polyline: false,
+        rectangle: true,
+        circle: false,
+        marker: false
+      }
+    });
+
+    if (!initialized){
+      drawControl.addTo(map);
+      initialized = true;
+    }
+
+    map.on('draw:created', showPolygonArea);
+    map.on('draw:edited', showPolygonAreaEdited);
+
+    function showPolygonAreaEdited(e) {
+      e.layers.eachLayer(function(layer) {
+        showPolygonArea({ layer: layer });
+      });
+    }
+
+    function showPolygonArea(e) {
+      var minLat = e.layer._latlngs[0]["lat"];
+      var maxLat = e.layer._latlngs[1]["lat"];
+      var minLong = e.layer._latlngs[1]["lng"];
+      var maxLong = e.layer._latlngs[2]["lng"];
+
+      var avgStars = getAvgStarByArea(data, minLat, maxLat, minLong, maxLong);
+
+      $('#avgRatingForSelection').html(avgStars);
+
+      featureGroup.clearLayers();
+      featureGroup.addLayer(e.layer);
+
+      e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
+      e.layer.openPopup();
+    }
+  }
+
+  function showTipLocationAnimation(user_id, userTipPathObj){
+
+    geocoder.query(currentCity, showMap);
+
+    function showMap(err, data) {
+        if (data.lbounds) {
+            map.fitBounds(data.lbounds);
+        } else if (data.latlng) {
+            map.setView([data.latlng[0], data.latlng[1]], 15);
+        }
+    }
+
+    console.log(new Date(userTipPathObj[user_id][0]["date"]).getTime()/1000);
+
+    for (var i = 0; i < userTipPathObj[user_id].length; i++) {
+        var lat = userTipPathObj[user_id][i]["lat"];
+        var long = userTipPathObj[user_id][i]["long"];
+        var title = userTipPathObj[user_id][i]["text"];
+
+        var marker = L.marker(new L.LatLng(lat, long), {
+            icon: L.mapbox.marker.icon({'marker-color': '0044FF'}),
+            title: title
+        });
+        marker.bindPopup(title);
+        map.addLayer(marker);
+    }
+
+    animateTipLocations(userTipPathObj[user_id])
+  }
+
+  function animateTipLocations(userTips){
+    var times = [];
+    for (var i = 0; i < userTips.length; i++){
+      times.push(new Date(userTips[i]["date"]).getTime());
+    }
+
+    var path = [];
+    while (times.length > 0){
+      var ind1 = times.indexOf(Math.min.apply(Math, times));
+      times.splice(ind1, 1);
+      path.push([Number(userTips[ind1]["lat"]), Number(userTips[ind1]["long"])])
+    }
+
+    console.log(path)
+
+    //initialize marker
+    // var ind1 = times.indexOf(Math.min.apply(Math, times));
+    // times.splice(ind1, 1);
+    // var ind2 = times.indexOf(Math.min.apply(Math, times));
+
+    // var start = [userTips[ind1]["lat"], userTips[ind1]["long"]];
+    // var end = [userTips[ind2]["lat"], userTips[ind2]["long"]];
+
+    var marker = L.marker(path[0], {
+        icon: L.mapbox.marker.icon({
+          'marker-color': '#f86767'
+        })
+    });
+
+    console.log(path[0]);
+    console.log(path[1]);
+    console.log(path[2]); 
+
+    //var path = [[40.4094, -79.91], [40.3996, -80.0434], [40.4198, -80.0456]];
+
+    var t = 0;
+    var ind = 0;
+    var timer = window.setInterval(function() {
+        var first = path[ind];
+        var second = path[ind+1];
+        console.log(first);
+        console.log(second);
+        marker.setLatLng(L.latLng(
+          first[0] + t*(second[0]-first[0])/10, 
+          first[1] + t*(second[1]-first[1])/10));
+        t += 1;
+        var m = marker.getLatLng();
+        if (m.lat == second[0] && m.lng == second[1]){
+            console.log("gets here")
+            t = 0;
+            ind++;
+            if (ind > path.length-2) clearInterval(timer);
+        } 
+    }, 50);
+
+    marker.addTo(map);
+  }
+
+  function getAvgStarByArea(data, minLat, maxLat, minLong, maxLong){
+    var avgStars;
+    var count = 0;
+    for (var i = 0; i < data.length; i++){
+      var lat = Number(data[i]["latitude"]);
+      var long = Number(data[i]["longitude"]);
+      var stars = Number(data[i]["stars"]);
+      if (lat > minLat && lat <= maxLat && long > minLong && long <= maxLong){
+        if (avgStars == null) avgStars = stars;
+        else avgStars = (avgStars*count + stars)/(count + 1);
+        count++;
+      }
+    }
+
+    return avgStars;
+  }      
+
+  function buildUserLocationsObj(){
+    for (var i = 0; i < 10000; i++){
+ 
+      var biz_id = tipData[i]["business_id"];
+      var user_id = tipData[i]["user_id"];
+      var businessFound = null;
+      var index = 0;
+
+      while(index < dataToggle.length && !businessFound){
+        businessFound = findBusinessStateFromId(biz_id, dataToggle[index]);
+        index++;
+      }
+
+      var state;
+      if (businessFound){
+        buildPathObj(user_id, businessFound["latitude"], businessFound["longitude"], tipData[i]["date"], tipData[i]["text"]);
+
+        var city = cityToggle[index-1];
+        state = city.substring(city.length-2, city.length);
+
+        if (userLocations[state][user_id] == undefined){
+          userLocations[state][user_id] = 1;
+        }
+        else {
+          userLocations[state][user_id]++;
+        }
+      }
+    }
+  }
+
+  function buildPathObj(user_id, lat, long, date, text){
+    if (userTipPathObj[user_id] == undefined){
+      userTipPathObj[user_id] = [];
+      userTipPathObj[user_id].push({"lat": lat, "long": long, "date": date, "text": text});
+    }
+    else {
+      userTipPathObj[user_id].push({"lat": lat, "long": long, "date": date, "text": text});
+    }
+  }
+
+  function getTopUsersByCity(){
+    var topUsersInEachCity = [];
+    var temp = [];
+
+    for (var key in userLocations){
+      //console.log(key)
+      var list = userLocations[key];
+      var keysSorted = Object.keys(list).sort(function(a,b){return list[b]-list[a]});
+      for (var i = 0; i < 10; i++){
+        temp[i] = findUserFromId(keysSorted[i], userData);
+      } 
+      topUsersInEachCity.push(temp);
+      temp = [];
+    }
+
+    return topUsersInEachCity;
+  }
+
+  function findBusinessStateFromId(biz_id, businessData){
+    for(var i = 0; i < businessData.length; i++){
+      if (biz_id == businessData[i]["business_id"]){
+        return businessData[i];
+      }
+    }
+
+    return null;
+  }
+
+  function findUserFromId(user_id, userData){
+    for (var i = 0; i < userData.length; i++){
+      if (user_id == userData[i]["user_id"]){
+        return userData[i];
+      }
+    }
+
+    return [];
+  }
+
+  function showTopUsers(topUsers){
+    var arr = topUsers[indexOfCity];
+    for (var i = 0; i < arr.length; i++){
+      var node = document.createElement("LI");
+      node.setAttribute("id", arr[i]["user_id"]);
+      var textnode = document.createTextNode(arr[i]["name"]);
+      node.appendChild(textnode);                              
+      document.getElementById("topUsers").appendChild(node);  
+    }
+  }
+
+});
+});
+});
+});
+});
+});
+});
 });
 
-function findBusinessStateFromTip(biz_id, businessData){
-  
-}
 
-
-  // function findMinLat(data){
-  //   var minLat = data[0]["latitude"];
-  //   for (var i = 1; i < data.length; i++){
-  //     var lat = data[i]["latitude"];
-  //     if (lat < minLat) lat = minLat;
-  //   }
-
-  //   return minLat;
-  // }
-
+// AZ. 5kJYTUtFUJT24dWNs6eW8w
+// IL. TIPAxQKKs058vSURbfoBwA
+// NV. JEvkfVPf_DuhX-ntE5L6bQ 
+// PA. QcGi0cDzzGLb3LmiI33Psg
+// WI. lC0KGXmIhyjzghBUlVnkhQ
