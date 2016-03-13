@@ -1,5 +1,6 @@
 
 d3.csv('data/tip_data/tip.csv', function(err, tipData){
+d3.csv('data/review_data/short_reviews.csv', function(err, reviewData){
 d3.csv('data/user_data/new_user.csv', function(err, userData){
 d3.csv("data/biz_data/WI_Business_Data.csv", function(err, dataWI) {
 d3.csv("data/biz_data/AZ_Business_Data.csv", function(err, dataAZ) {
@@ -37,11 +38,11 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
   /* INITIAL FUNCTION CALLS */
   drawMap(data, currentCity);
-  businessPics();
+  //businessPics();
   buildUserLocationsObj();
   var topUsers = getTopUsersByCity();
   showTopUsers(topUsers);
-  poppy();
+  //poppy();
 
 
 
@@ -307,12 +308,37 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     return avgStars;
   }
+/**
+  need other
+  function buildBusinessInfoObj(){
+    for (var i = 0; i < 10000; i++){
+      var biz_id = businessFound[i]["business_id"];
+      var biz2_id = reviewData[i]["business_id"];
+      var votes_cool = reviewData[i]["votes_cool"];
+      var votes_useful = reviewData[i] ["votes_useful"];
+      var votes_funny = reviewData[i] ["votes_funny"];
+      var stars =reviewData[i]["stars"];
+      var businessFound = null;
+      var index = 0;
+
+      while(index < dataToggle.length && !businessFound){
+        businessFound = findBusinessStateFromId(biz_id, dataToggle[index]);
+        index++;
+      }
+      if(businessFound == biz2_id){
+        buildBusinessInfo(biz_id,votes_funny,votes_cool, votes_useful)
+      }
+    }
+  }
+
+  **/
 
   function buildUserLocationsObj(){
     for (var i = 0; i < 10000; i++){
-
       var biz_id = tipData[i]["business_id"];
       var user_id = tipData[i]["user_id"];
+      var date_id = tipData[i]["date"];
+      var text_id = tipData[i]["text"]; //this is the actual tips
       var businessFound = null;
       var index = 0;
 
@@ -323,7 +349,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
       var state;
       if (businessFound){
-        buildPathObj(user_id, businessFound["latitude"], businessFound["longitude"], tipData[i]["date"], tipData[i]["text"]);
+        buildPathObj(user_id, businessFound["latitude"], businessFound["longitude"], date_id , text_id);
 
         var city = cityToggle[index-1];
         state = city.substring(city.length-2, city.length);
@@ -365,6 +391,16 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     return topUsersInEachCity;
   }
+/**
+  function getMostReviewedBusinessesByCity(){
+    var topBusinessesbyCity = [];
+    var temp= [];
+    for (var key in userLocations){
+
+    }
+  }**/
+
+
 
   function findBusinessStateFromId(biz_id, businessData){
     for(var i = 0; i < businessData.length; i++){
@@ -396,7 +432,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       document.getElementById("topUsers").appendChild(node);
     }
   }
-/** **/
+/**
   function businessPics(){
         map.attributionControl
         .addAttribution('<a href="https://mapillary.com/">Images from Mapillary</a>');
@@ -419,7 +455,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             .replace('WEST', map.getBounds().getWest())
             .replace('EAST', map.getBounds().getEast()));
   }
-
+**/
+});
 });
 });
 });
