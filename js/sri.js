@@ -38,14 +38,13 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
   /* INITIAL FUNCTION CALLS */
   drawMap(data, currentCity);
-  //businessPics();
   buildUserLocationsObj();
   var topUsers = getTopUsersByCity();
   showTop(topUsers, "user_id");
-  //poppy();
   var topBusinesses = getTopBusinesses();
-  //showTopBusinesses(topBusinesses);
-  //console.log(topBusinesses)
+
+  var ratingObj = {};
+  //findRatingOverTime(ratingObj);
 
   /* JQUERY FUNCTIONS */
   $('#ratingFilter').on('click', function(){
@@ -68,10 +67,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     $(this).addClass("citySelected")
     indexOfCity = this.id;
     currentCity = cityToggle[indexOfCity];
-    //console.log(indexOfCity);
-    //console.log(currentCity)
     data = dataToggle[indexOfCity];
-   // $('#cityTitle').html(currentCity);
 
     $('#avgRatingForSelection').html('');
     map.removeLayer(markers);
@@ -97,6 +93,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     $("#topUsers").empty();
     topBusinesses = getTopBusinesses();
     showTop(topBusinesses, "business_id");
+    console.log(topBusinesses)
+    addSlideShowToMap(topBusinesses);
   })
 
   $('#selectTopUsers').on('click', function(){
@@ -104,7 +102,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     topUsers = getTopUsersByCity();
     showTop(topUsers, "user_id");
   })
-
 
   /* DATA ANALYSIS FUNCTIONS */
   function drawMap(data, currentCity){
@@ -189,22 +186,32 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     //addSlideShowToMap();
   }
 
-  function addSlideShowToMap(){
+  function addSlideShowToMap(topBusinesses){
 
-    //var data = dataToggle[indexOfCity];
+    map.removeLayer(markers);
 
-    console.log(data[0])
+    geocoder.query(currentCity, showMap);
+
+    function showMap(err, data) {
+        if (data.lbounds) {
+            map.fitBounds(data.lbounds);
+        } else if (data.latlng) {
+            map.setView([data.latlng[0], data.latlng[1]], 15);
+        }
+    }
+
+    var data = topBusinesses;
 
     var myLayer = L.mapbox.featureLayer().addTo(map);
 
     var geoJson = [];
     for (var i = 0; i < data.length; i++){
-      var lat = data[i]["latitude"];
-      var lng = data[i]["longitude"];
+      var lat = Number(data[i]["latitude"]);
+      var lng = Number(data[i]["longitude"]);
       var name = data[i]["name"];
       var obj = {
           type: 'Feature',
-          "geometry": { "type": "Point", "coordinates": [lat, lng]},
+          "geometry": { "type": "Point", "coordinates": [lng, lat]},
           "properties": {
               'title': name,
               'marker-color': '#3c4e5a',
@@ -213,10 +220,10 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
               // Store the image url and caption in an array.
               'images': [
-                ['http://i.imgur.com/wsNrRVQ.jpg','this is slide 1'],
-                ['http://i.imgur.com/wsNrRVQ.jpg','this is slide 2'],
-                ['http://i.imgur.com/wsNrRVQ.jpg','this is slide 3']
-              ]
+                ['http://i.imgur.com/O6QEpBs.jpg','this is slide 1'],
+                ['http://i.imgur.com/O6QEpBs.jpg','this is slide 2'],
+                ['http://i.imgur.com/O6QEpBs.jpg','this is slide 3']
+              ] 
           }
       };
 
@@ -234,7 +241,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             var img = images[i];
 
             slideshowContent += '<div class="image' + (i === 0 ? ' active' : '') + '">' +
-                                  '<img src="' + img[0] + '" />' +
+                                  '<div id="box"><div/>' +
                                   '<div class="caption">' + img[1] + '</div>' +
                                 '</div>';
         }
@@ -287,8 +294,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     geocoder.query(currentCity, showMap);
 
-    console.log(currentCity)
-
     function showMap(err, data) {
         if (data.lbounds) {
             map.fitBounds(data.lbounds);
@@ -296,8 +301,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             map.setView([data.latlng[0], data.latlng[1]], 15);
         }
     }
-
-    //console.log(new Date(userTipPathObj[user_id][0]["date"]).getTime()/1000);
 
     for (var i = 0; i < userTipPathObj[user_id].length; i++) {
         var lat = userTipPathObj[user_id][i]["lat"];
@@ -469,30 +472,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     return [];
   }
 
-  // function showTopUsers(topUsers){
-  //   var arr = topUsers[indexOfCity];
-  //   for (var i = 0; i < arr.length; i++){
-  //     var node = document.createElement("LI");
-  //     node.setAttribute("id", arr[i]["user_id"]);
-  //     node.setAttribute("class", "tableElement");
-  //     var textnode = document.createTextNode(i+1 + " " + arr[i]["name"]);
-  //     node.appendChild(textnode);
-  //     document.getElementById("topUsers").appendChild(node);
-  //   }
-  // }
-
-  // function showTopBusinesses(topBusinesses){
-  //   var arr = topBusinesses;
-  //   for (var i = 0; i < arr.length; i++){
-  //     var node = document.createElement("LI");
-  //     node.setAttribute("id", arr[i]["business_id"]);
-  //     node.setAttribute("class", "tableElement");
-  //     var textnode = document.createTextNode(i+1 + " " + arr[i]["name"]);
-  //     node.appendChild(textnode);
-  //     document.getElementById("topUsers").appendChild(node);
-  //   }
-  // }
-
   function showTop(arr, id){
     for (var i = 0; i < arr.length; i++){
       var node = document.createElement("LI");
@@ -503,6 +482,12 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       document.getElementById("topUsers").appendChild(node);
     }
   }
+
+  // function findRatingOverTime(ratingObj){
+  //   for (var i = 0; i < reviewData; i++){
+  //     ratingObj[review_data[i]["business_id"]] = 
+  //   }
+  // }
 
 });
 });
