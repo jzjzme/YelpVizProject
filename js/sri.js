@@ -121,7 +121,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     }
     map.addLayer(markers);
 
-
     featureGroup = L.featureGroup().addTo(map);
 
     drawControl = new L.Control.Draw({
@@ -167,6 +166,102 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
       e.layer.openPopup();
     }
+
+    //addSlideShowToMap();
+  }
+
+  function addSlideShowToMap(){
+
+    //var data = dataToggle[indexOfCity];
+
+    console.log(data[0])
+
+    var myLayer = L.mapbox.featureLayer().addTo(map);
+
+    var geoJson = [];
+    for (var i = 0; i < data.length; i++){
+      var lat = data[i]["latitude"];
+      var lng = data[i]["longitude"];
+      var name = data[i]["name"];
+      var obj = {
+          type: 'Feature',
+          "geometry": { "type": "Point", "coordinates": [lat, lng]},
+          "properties": {
+              'title': name,
+              'marker-color': '#3c4e5a',
+              'marker-symbol': 'monument',
+              'marker-size': 'large',
+
+              // Store the image url and caption in an array.
+              'images': [
+                ['http://i.imgur.com/wsNrRVQ.jpg','this is slide 1'],
+                ['http://i.imgur.com/wsNrRVQ.jpg','this is slide 2'],
+                ['http://i.imgur.com/wsNrRVQ.jpg','this is slide 3']
+              ]
+          }
+      };
+
+      geoJson.push(obj);
+    }
+
+    // Add custom popup html to each marker.
+    myLayer.on('layeradd', function(e) {
+        var marker = e.layer;
+        var feature = marker.feature;
+        var images = feature.properties.images
+        var slideshowContent = '';
+
+        for(var i = 0; i < images.length; i++) {
+            var img = images[i];
+
+            slideshowContent += '<div class="image' + (i === 0 ? ' active' : '') + '">' +
+                                  '<img src="' + img[0] + '" />' +
+                                  '<div class="caption">' + img[1] + '</div>' +
+                                '</div>';
+        }
+
+        // Create custom popup content
+        var popupContent =  '<div id="' + feature.properties.id + '" class="popup">' +
+                                '<h2>' + feature.properties.title + '</h2>' +
+                                '<div class="slideshow">' +
+                                    slideshowContent +
+                                '</div>' +
+                                '<div class="cycle">' +
+                                    '<a href="#" class="prev">&laquo; Previous</a>' +
+                                    '<a href="#" class="next">Next &raquo;</a>' +
+                                '</div>'
+                            '</div>';
+
+        // http://leafletjs.com/reference.html#popup
+        marker.bindPopup(popupContent,{
+            closeButton: false,
+            minWidth: 320
+        });
+    });
+
+    // Add features to the map
+    myLayer.setGeoJSON(geoJson);
+
+    $('#map').on('click', '.popup .cycle a', function() {
+        var $slideshow = $('.slideshow'),
+            $newSlide;
+
+        if ($(this).hasClass('prev')) {
+            $newSlide = $slideshow.find('.active').prev();
+            if ($newSlide.index() < 0) {
+                $newSlide = $('.image').last();
+            }
+        } else {
+            $newSlide = $slideshow.find('.active').next();
+            if ($newSlide.index() < 0) {
+                $newSlide = $('.image').first();
+            }
+        }
+
+        $slideshow.find('.active').removeClass('active').hide();
+        $newSlide.addClass('active').show();
+        return false;
+    });
   }
 
   function showTipLocationAnimation(user_id, userTipPathObj){
@@ -183,7 +278,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         }
     }
 
-    console.log(new Date(userTipPathObj[user_id][0]["date"]).getTime()/1000);
+    //console.log(new Date(userTipPathObj[user_id][0]["date"]).getTime()/1000);
 
     for (var i = 0; i < userTipPathObj[user_id].length; i++) {
         var lat = userTipPathObj[user_id][i]["lat"];
