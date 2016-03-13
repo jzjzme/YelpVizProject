@@ -94,8 +94,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             map.fitBounds(data.lbounds);
         } else if (data.latlng) {
             map.setView([data.latlng[0], data.latlng[1]], 20);
-            //map.setView([29, -26], 2);
-
         }
     }
 
@@ -203,18 +201,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     while (times.length > 0){
       var ind1 = times.indexOf(Math.min.apply(Math, times));
       times.splice(ind1, 1);
-      path.push([Number(userTips[ind1]["lat"]), Number(userTips[ind1]["long"])])
+      path.push([Number(userTips[ind1]["lat"]), Number(userTips[ind1]["long"])  ])
     }
-
-    console.log(path)
-
-    //initialize marker
-    // var ind1 = times.indexOf(Math.min.apply(Math, times));
-    // times.splice(ind1, 1);
-    // var ind2 = times.indexOf(Math.min.apply(Math, times));
-
-    // var start = [userTips[ind1]["lat"], userTips[ind1]["long"]];
-    // var end = [userTips[ind2]["lat"], userTips[ind2]["long"]];
 
     var marker = L.marker(path[0], {
         icon: L.mapbox.marker.icon({
@@ -222,26 +210,17 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         })
     });
 
-    console.log(path[0]);
-    console.log(path[1]);
-    console.log(path[2]); 
-
-    //var path = [[40.4094, -79.91], [40.3996, -80.0434], [40.4198, -80.0456]];
-
     var t = 0;
     var ind = 0;
     var timer = window.setInterval(function() {
         var first = path[ind];
         var second = path[ind+1];
-        console.log(first);
-        console.log(second);
         marker.setLatLng(L.latLng(
           first[0] + t*(second[0]-first[0])/10, 
           first[1] + t*(second[1]-first[1])/10));
         t += 1;
         var m = marker.getLatLng();
         if (m.lat == second[0] && m.lng == second[1]){
-            console.log("gets here")
             t = 0;
             ind++;
             if (ind > path.length-2) clearInterval(timer);
