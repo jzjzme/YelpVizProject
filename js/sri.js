@@ -1,6 +1,7 @@
 
 d3.csv('data/tip_data/tip.csv', function(err, tipData){
-d3.csv('data/user_data/new_user.csv', function(err, userData){  
+d3.csv('data/review_data/short_reviews.csv', function(err, reviewData){
+d3.csv('data/user_data/new_user.csv', function(err, userData){
 d3.csv("data/biz_data/WI_Business_Data.csv", function(err, dataWI) {
 d3.csv("data/biz_data/AZ_Business_Data.csv", function(err, dataAZ) {
 d3.csv("data/biz_data/Vegas_Biz_Data.csv", function(err, dataVegas) {
@@ -22,7 +23,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   //variable initialization
   var cityToggle = ["Las Vegas, NV", "Urbana-Champaign, IL", "Phoenix, AZ", "Madison, WI", "Pittsburgh, PA", "Charlotte, NC"];
   var dataToggle = [dataVegas, dataIL, dataAZ, dataWI, dataPA, dataNC];
-  
+
   var userLocations =  {};
   for (var i = 0; i < cityToggle.length; i++){
     var city = cityToggle[i];
@@ -37,9 +38,13 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
   /* INITIAL FUNCTION CALLS */
   drawMap(data, currentCity);
+  //businessPics();
   buildUserLocationsObj();
   var topUsers = getTopUsersByCity();
   showTopUsers(topUsers);
+  //poppy();
+
+
 
   // console.log(userLocations)
   // console.log(topUsers);
@@ -97,7 +102,9 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         }
     }
 
-    markers = new L.MarkerClusterGroup();
+    markers = new L.MarkerClusterGroup({
+      maxClusterradius:1
+    });
 
     for (var i = 0; i < data.length; i++) {
         var lat = data[i]["latitude"];
@@ -111,8 +118,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         marker.bindPopup(title);
         markers.addLayer(marker);
     }
-
     map.addLayer(markers);
+
 
     featureGroup = L.featureGroup().addTo(map);
 
@@ -184,12 +191,29 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             icon: L.mapbox.marker.icon({'marker-color': '0044FF'}),
             title: title
         });
+
         marker.bindPopup(title);
         map.addLayer(marker);
     }
 
     animateTipLocations(userTipPathObj[user_id])
   }
+ /**function not working but compiles
+  function poppy(){
+
+    var markerList = document.getElementById('marker-list');
+
+    map.featureLayer.on('ready', function(e) {
+        map.featureLayer.eachLayer(function(layer) {
+            var item = markerList.appendChild(document.createElement('li'));
+            item.innerHTML = layer.toGeoJSON().properties.title;
+            item.onclick = function() {
+               map.setView(layer.getLatLng,15);
+               layer.openPopup();
+            };
+        });
+    });
+  }**/
 
   function animateTipLocations(userTips){
     var times = [];
@@ -216,7 +240,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         var first = path[ind];
         var second = path[ind+1];
         marker.setLatLng(L.latLng(
-          first[0] + t*(second[0]-first[0])/10, 
+          first[0] + t*(second[0]-first[0])/10,
           first[1] + t*(second[1]-first[1])/10));
         t += 1;
         var m = marker.getLatLng();
@@ -224,12 +248,29 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             t = 0;
             ind++;
             if (ind > path.length-2) clearInterval(timer);
-        } 
+        }
     }, 50);
+/**
+    map.featureLayer.on('ready', function(e) {
+            cycle(marker);
+        });
+**/
 
     marker.addTo(map);
-  }
 
+  }
+/**
+    function cycle(marker) {
+        var i = 0;
+        function run() {
+            if (++i > marker.length - 1) i = 0;
+            map.setView(marker[i].LatLng[0],marker[i].LatLng[1], 12);
+            marker[i].openPopup();
+            window.setTimeout(run, 3000);
+        }
+        run();
+    }
+**/
   function getAvgStarByArea(data, minLat, maxLat, minLong, maxLong){
     var avgStars;
     var count = 0;
@@ -245,13 +286,38 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     }
 
     return avgStars;
-  }      
+  }
+/**
+  need other
+  function buildBusinessInfoObj(){
+    for (var i = 0; i < 10000; i++){
+      var biz_id = businessFound[i]["business_id"];
+      var biz2_id = reviewData[i]["business_id"];
+      var votes_cool = reviewData[i]["votes_cool"];
+      var votes_useful = reviewData[i] ["votes_useful"];
+      var votes_funny = reviewData[i] ["votes_funny"];
+      var stars =reviewData[i]["stars"];
+      var businessFound = null;
+      var index = 0;
+
+      while(index < dataToggle.length && !businessFound){
+        businessFound = findBusinessStateFromId(biz_id, dataToggle[index]);
+        index++;
+      }
+      if(businessFound == biz2_id){
+        buildBusinessInfo(biz_id,votes_funny,votes_cool, votes_useful)
+      }
+    }
+  }
+
+  **/
 
   function buildUserLocationsObj(){
     for (var i = 0; i < 10000; i++){
- 
       var biz_id = tipData[i]["business_id"];
       var user_id = tipData[i]["user_id"];
+      var date_id = tipData[i]["date"];
+      var text_id = tipData[i]["text"]; //this is the actual tips
       var businessFound = null;
       var index = 0;
 
@@ -262,7 +328,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
       var state;
       if (businessFound){
-        buildPathObj(user_id, businessFound["latitude"], businessFound["longitude"], tipData[i]["date"], tipData[i]["text"]);
+        buildPathObj(user_id, businessFound["latitude"], businessFound["longitude"], date_id , text_id);
 
         var city = cityToggle[index-1];
         state = city.substring(city.length-2, city.length);
@@ -297,13 +363,23 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       var keysSorted = Object.keys(list).sort(function(a,b){return list[b]-list[a]});
       for (var i = 0; i < 10; i++){
         temp[i] = findUserFromId(keysSorted[i], userData);
-      } 
+      }
       topUsersInEachCity.push(temp);
       temp = [];
     }
 
     return topUsersInEachCity;
   }
+/**
+  function getMostReviewedBusinessesByCity(){
+    var topBusinessesbyCity = [];
+    var temp= [];
+    for (var key in userLocations){
+
+    }
+  }**/
+
+
 
   function findBusinessStateFromId(biz_id, businessData){
     for(var i = 0; i < businessData.length; i++){
@@ -331,11 +407,35 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       var node = document.createElement("LI");
       node.setAttribute("id", arr[i]["user_id"]);
       var textnode = document.createTextNode(arr[i]["name"]);
-      node.appendChild(textnode);                              
-      document.getElementById("topUsers").appendChild(node);  
+      node.appendChild(textnode);
+      document.getElementById("topUsers").appendChild(node);
     }
   }
+/**
+  function businessPics(){
+        map.attributionControl
+        .addAttribution('<a href="https://mapillary.com/">Images from Mapillary</a>');
 
+        var API_ENDPOINT = 'https://api.mapillary.com/v1/im/search?' +
+            'min-lat=SOUTH&max-lat=NORTH&min-lon=WEST&max-lon=EAST&' +
+            'max-results=100&geojson=true';
+
+        var images = L.mapbox.featureLayer()
+            .on('layeradd', function(marker) {
+                marker.bindPopup('<img src="' + e.layer.feature.properties.image + '" />', {
+                    minWidth: 340
+                });
+            })
+            .addTo(map);
+
+        images.loadURL(API_ENDPOINT
+            .replace('SOUTH', map.getBounds().getSouth())
+            .replace('NORTH', map.getBounds().getNorth())
+            .replace('WEST', map.getBounds().getWest())
+            .replace('EAST', map.getBounds().getEast()));
+  }
+**/
+});
 });
 });
 });
@@ -348,6 +448,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
 // AZ. 5kJYTUtFUJT24dWNs6eW8w
 // IL. TIPAxQKKs058vSURbfoBwA
-// NV. JEvkfVPf_DuhX-ntE5L6bQ 
+// NV. JEvkfVPf_DuhX-ntE5L6bQ
 // PA. QcGi0cDzzGLb3LmiI33Psg
 // WI. lC0KGXmIhyjzghBUlVnkhQ
