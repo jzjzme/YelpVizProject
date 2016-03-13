@@ -43,6 +43,9 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   var topUsers = getTopUsersByCity();
   showTopUsers(topUsers);
   //poppy();
+  var topBusinesses = getTopBusinesses();
+
+  console.log(topBusinesses)
 
   /* JQUERY FUNCTIONS */
   $('#ratingFilter').on('click', function(){
@@ -394,6 +397,24 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     }
   }
 
+  function getTopBusinesses(){
+    var temp = [];
+    var best_biz = [];
+    var biz_d = dataToggle[indexOfCity]
+
+    for (var i =0; i < biz_d.length; i++){
+      temp.push(Number(biz_d[i]['review_count']));
+    }
+
+    for (var i = 0; i < 10; i++){
+      var ind1 = temp.indexOf(Math.max.apply(Math, temp));
+      best_biz.push(biz_d[ind1]);
+      temp.splice(ind1, 1);
+    }
+    
+    return best_biz;
+  }
+
   function getTopUsersByCity(){
     var topUsersInEachCity = [];
     var temp = [];
@@ -453,103 +474,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 });
 });
 });
-
- /**function not working but compiles
-  function poppy(){
-
-    var markerList = document.getElementById('marker-list');
-
-    map.featureLayer.on('ready', function(e) {
-        map.featureLayer.eachLayer(function(layer) {
-            var item = markerList.appendChild(document.createElement('li'));
-            item.innerHTML = layer.toGeoJSON().properties.title;
-            item.onclick = function() {
-               map.setView(layer.getLatLng,15);
-               layer.openPopup();
-            };
-        });
-    });
-  }**/
-
-  /**
-    function getMostReviewedBusinessesByCity(){
-      var topBusinessesbyCity = [];
-      var temp= [];
-      for (var key in userLocations){
-
-      }
-    }**/
-
-/**
-  need other
-  function buildBusinessInfoObj(){
-    for (var i = 0; i < 10000; i++){
-      var biz_id = businessFound[i]["business_id"];
-      var biz2_id = reviewData[i]["business_id"];
-      var votes_cool = reviewData[i]["votes_cool"];
-      var votes_useful = reviewData[i] ["votes_useful"];
-      var votes_funny = reviewData[i] ["votes_funny"];
-      var stars =reviewData[i]["stars"];
-      var businessFound = null;
-      var index = 0;
-
-      while(index < dataToggle.length && !businessFound){
-        businessFound = findBusinessStateFromId(biz_id, dataToggle[index]);
-        index++;
-      }
-      if(businessFound == biz2_id){
-        buildBusinessInfo(biz_id,votes_funny,votes_cool, votes_useful)
-      }
-    }
-  }
-
-  **/
-
-  /**
-      function cycle(marker) {
-          var i = 0;
-          function run() {
-              if (++i > marker.length - 1) i = 0;
-              map.setView(marker[i].LatLng[0],marker[i].LatLng[1], 12);
-              marker[i].openPopup();
-              window.setTimeout(run, 3000);
-          }
-          run();
-      }
-  **/
-
-  /**
-      map.featureLayer.on('ready', function(e) {
-              cycle(marker);
-          });
-  **/
-
-  /**
-    function businessPics(){
-          map.attributionControl
-          .addAttribution('<a href="https://mapillary.com/">Images from Mapillary</a>');
-
-          var API_ENDPOINT = 'https://api.mapillary.com/v1/im/search?' +
-              'min-lat=SOUTH&max-lat=NORTH&min-lon=WEST&max-lon=EAST&' +
-              'max-results=100&geojson=true';
-
-          var images = L.mapbox.featureLayer()
-              .on('layeradd', function(marker) {
-                  marker.bindPopup('<img src="' + e.layer.feature.properties.image + '" />', {
-                      minWidth: 340
-                  });
-              })
-              .addTo(map);
-
-          images.loadURL(API_ENDPOINT
-              .replace('SOUTH', map.getBounds().getSouth())
-              .replace('NORTH', map.getBounds().getNorth())
-              .replace('WEST', map.getBounds().getWest())
-              .replace('EAST', map.getBounds().getEast()));
-    }
-  **/
-
-
 
 // AZ. 5kJYTUtFUJT24dWNs6eW8w
 // IL. TIPAxQKKs058vSURbfoBwA
