@@ -29,3 +29,17 @@ body {
 #marker-list li:hover {
 		background:#eee;
 }
+
+.cityToggle {
+	width: 100px;
+	height: 50px;
+	color: red;
+	background-color: black;
+	border: 5px solid red;
+	display: inline-block;
+}
+
+#citySelection {
+	width: 100%;
+	background-color: red;
+}

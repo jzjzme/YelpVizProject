@@ -21,8 +21,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   var initialized = false;
 
   //variable initialization
-  var cityToggle = ["Las Vegas, NV", "Urbana-Champaign, IL", "Phoenix, AZ", "Madison, WI", "Pittsburgh, PA", "Charlotte, NC"];
-  var dataToggle = [dataVegas, dataIL, dataAZ, dataWI, dataPA, dataNC];
+  var cityToggle = ["Urbana-Champaign, IL", "Phoenix, AZ", "Madison, WI", "Pittsburgh, PA", "Charlotte, NC"];
+  var dataToggle = [dataIL, dataAZ, dataWI, dataPA, dataNC];
 
   var userLocations =  {};
   for (var i = 0; i < cityToggle.length; i++){
@@ -31,7 +31,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     userLocations[state] = {};
   }
   var userTipPathObj = {};
-  var indexOfCity = 4;
+  var indexOfCity = 0;
   var currentCity = cityToggle[indexOfCity];
   var data = dataToggle[indexOfCity];
   $('#cityTitle').html(currentCity);
@@ -43,13 +43,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   var topUsers = getTopUsersByCity();
   showTopUsers(topUsers);
   //poppy();
-
-
-
-  // console.log(userLocations)
-  // console.log(topUsers);
-  // console.log(userTipPathObj)
-  //console.log(tipData[0])
 
   /* JQUERY FUNCTIONS */
   $('#ratingFilter').on('click', function(){
@@ -68,10 +61,13 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   });
 
   $('.cityToggle').on('click', function(){
+    $(".citySelected").removeClass("citySelected");
+    $(this).addClass("citySelected")
+
     indexOfCity = this.id;
     currentCity = cityToggle[indexOfCity];
     data = dataToggle[indexOfCity];
-    $('#cityTitle').html(currentCity);
+   // $('#cityTitle').html(currentCity);
 
     $('#avgRatingForSelection').html('');
     map.removeLayer(markers);
@@ -81,6 +77,11 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   })
 
   $('#topUsers > li').on('click', function(){
+    $(".selectedUser").removeClass("selectedUser");
+    $(this).addClass("selectedUser");
+
+    console.log(this);
+
     $('#avgRatingForSelection').html('');
     map.removeLayer(markers);
     showTipLocationAnimation(this.id, userTipPathObj);
@@ -172,6 +173,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     geocoder.query(currentCity, showMap);
 
+    console.log(currentCity)
+
     function showMap(err, data) {
         if (data.lbounds) {
             map.fitBounds(data.lbounds);
@@ -198,22 +201,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     animateTipLocations(userTipPathObj[user_id])
   }
- /**function not working but compiles
-  function poppy(){
-
-    var markerList = document.getElementById('marker-list');
-
-    map.featureLayer.on('ready', function(e) {
-        map.featureLayer.eachLayer(function(layer) {
-            var item = markerList.appendChild(document.createElement('li'));
-            item.innerHTML = layer.toGeoJSON().properties.title;
-            item.onclick = function() {
-               map.setView(layer.getLatLng,15);
-               layer.openPopup();
-            };
-        });
-    });
-  }**/
 
   function animateTipLocations(userTips){
     var times = [];
@@ -250,27 +237,10 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
             if (ind > path.length-2) clearInterval(timer);
         }
     }, 50);
-/**
-    map.featureLayer.on('ready', function(e) {
-            cycle(marker);
-        });
-**/
 
     marker.addTo(map);
-
   }
-/**
-    function cycle(marker) {
-        var i = 0;
-        function run() {
-            if (++i > marker.length - 1) i = 0;
-            map.setView(marker[i].LatLng[0],marker[i].LatLng[1], 12);
-            marker[i].openPopup();
-            window.setTimeout(run, 3000);
-        }
-        run();
-    }
-**/
+
   function getAvgStarByArea(data, minLat, maxLat, minLong, maxLong){
     var avgStars;
     var count = 0;
@@ -287,30 +257,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     return avgStars;
   }
-/**
-  need other
-  function buildBusinessInfoObj(){
-    for (var i = 0; i < 10000; i++){
-      var biz_id = businessFound[i]["business_id"];
-      var biz2_id = reviewData[i]["business_id"];
-      var votes_cool = reviewData[i]["votes_cool"];
-      var votes_useful = reviewData[i] ["votes_useful"];
-      var votes_funny = reviewData[i] ["votes_funny"];
-      var stars =reviewData[i]["stars"];
-      var businessFound = null;
-      var index = 0;
-
-      while(index < dataToggle.length && !businessFound){
-        businessFound = findBusinessStateFromId(biz_id, dataToggle[index]);
-        index++;
-      }
-      if(businessFound == biz2_id){
-        buildBusinessInfo(biz_id,votes_funny,votes_cool, votes_useful)
-      }
-    }
-  }
-
-  **/
 
   function buildUserLocationsObj(){
     for (var i = 0; i < 10000; i++){
@@ -370,16 +316,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
     return topUsersInEachCity;
   }
-/**
-  function getMostReviewedBusinessesByCity(){
-    var topBusinessesbyCity = [];
-    var temp= [];
-    for (var key in userLocations){
-
-    }
-  }**/
-
-
 
   function findBusinessStateFromId(biz_id, businessData){
     for(var i = 0; i < businessData.length; i++){
@@ -406,44 +342,118 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     for (var i = 0; i < arr.length; i++){
       var node = document.createElement("LI");
       node.setAttribute("id", arr[i]["user_id"]);
-      var textnode = document.createTextNode(arr[i]["name"]);
+      node.setAttribute("class", "tableElement");
+      var textnode = document.createTextNode(i+1 + " " + arr[i]["name"]);
       node.appendChild(textnode);
       document.getElementById("topUsers").appendChild(node);
     }
   }
+
+});
+});
+});
+});
+});
+});
+});
+});
+});
+
+ /**function not working but compiles
+  function poppy(){
+
+    var markerList = document.getElementById('marker-list');
+
+    map.featureLayer.on('ready', function(e) {
+        map.featureLayer.eachLayer(function(layer) {
+            var item = markerList.appendChild(document.createElement('li'));
+            item.innerHTML = layer.toGeoJSON().properties.title;
+            item.onclick = function() {
+               map.setView(layer.getLatLng,15);
+               layer.openPopup();
+            };
+        });
+    });
+  }**/
+
+  /**
+    function getMostReviewedBusinessesByCity(){
+      var topBusinessesbyCity = [];
+      var temp= [];
+      for (var key in userLocations){
+
+      }
+    }**/
+
 /**
-  function businessPics(){
-        map.attributionControl
-        .addAttribution('<a href="https://mapillary.com/">Images from Mapillary</a>');
+  need other
+  function buildBusinessInfoObj(){
+    for (var i = 0; i < 10000; i++){
+      var biz_id = businessFound[i]["business_id"];
+      var biz2_id = reviewData[i]["business_id"];
+      var votes_cool = reviewData[i]["votes_cool"];
+      var votes_useful = reviewData[i] ["votes_useful"];
+      var votes_funny = reviewData[i] ["votes_funny"];
+      var stars =reviewData[i]["stars"];
+      var businessFound = null;
+      var index = 0;
 
-        var API_ENDPOINT = 'https://api.mapillary.com/v1/im/search?' +
-            'min-lat=SOUTH&max-lat=NORTH&min-lon=WEST&max-lon=EAST&' +
-            'max-results=100&geojson=true';
-
-        var images = L.mapbox.featureLayer()
-            .on('layeradd', function(marker) {
-                marker.bindPopup('<img src="' + e.layer.feature.properties.image + '" />', {
-                    minWidth: 340
-                });
-            })
-            .addTo(map);
-
-        images.loadURL(API_ENDPOINT
-            .replace('SOUTH', map.getBounds().getSouth())
-            .replace('NORTH', map.getBounds().getNorth())
-            .replace('WEST', map.getBounds().getWest())
-            .replace('EAST', map.getBounds().getEast()));
+      while(index < dataToggle.length && !businessFound){
+        businessFound = findBusinessStateFromId(biz_id, dataToggle[index]);
+        index++;
+      }
+      if(businessFound == biz2_id){
+        buildBusinessInfo(biz_id,votes_funny,votes_cool, votes_useful)
+      }
+    }
   }
-**/
-});
-});
-});
-});
-});
-});
-});
-});
-});
+
+  **/
+
+  /**
+      function cycle(marker) {
+          var i = 0;
+          function run() {
+              if (++i > marker.length - 1) i = 0;
+              map.setView(marker[i].LatLng[0],marker[i].LatLng[1], 12);
+              marker[i].openPopup();
+              window.setTimeout(run, 3000);
+          }
+          run();
+      }
+  **/
+
+  /**
+      map.featureLayer.on('ready', function(e) {
+              cycle(marker);
+          });
+  **/
+
+  /**
+    function businessPics(){
+          map.attributionControl
+          .addAttribution('<a href="https://mapillary.com/">Images from Mapillary</a>');
+
+          var API_ENDPOINT = 'https://api.mapillary.com/v1/im/search?' +
+              'min-lat=SOUTH&max-lat=NORTH&min-lon=WEST&max-lon=EAST&' +
+              'max-results=100&geojson=true';
+
+          var images = L.mapbox.featureLayer()
+              .on('layeradd', function(marker) {
+                  marker.bindPopup('<img src="' + e.layer.feature.properties.image + '" />', {
+                      minWidth: 340
+                  });
+              })
+              .addTo(map);
+
+          images.loadURL(API_ENDPOINT
+              .replace('SOUTH', map.getBounds().getSouth())
+              .replace('NORTH', map.getBounds().getNorth())
+              .replace('WEST', map.getBounds().getWest())
+              .replace('EAST', map.getBounds().getEast()));
+    }
+  **/
+
 
 
 // AZ. 5kJYTUtFUJT24dWNs6eW8w

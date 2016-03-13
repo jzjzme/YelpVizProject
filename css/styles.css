@@ -4,10 +4,109 @@ body {
 	font-family: Avenir Next;
 }
 
+#title {
+	font-size: 60px;
+	color: #c41200;
+	margin: 0 auto;
+	text-align: center;
+	letter-spacing: 2px;
+}
+
 #map { 
 	position:absolute; 
-	top:15%;
+	top: 22%;
 	bottom:15%; 
-	left: 10%; 
-	width:70%; 
+	left: 20%; 
+	width: 60%; 
 }
+
+.cityToggle {
+	width: 140px;
+	height: 30px;
+	line-height: 30px;
+	border: 2px solid #c41200;
+	background-color: white;
+	color: #c41200;
+	text-align: center;
+	display: inline-block;
+	font-size: 13px;
+	transition: all .2s ease-in;
+}
+
+.small {
+	font-size: 11px;
+}
+
+.cityToggle:hover {
+	cursor: pointer;
+	background-color: #c41200;
+	color: white;
+
+	transition: all .1s ease-out;
+}
+
+.citySelected {
+	background-color: #c41200;
+	color: white;
+}
+
+#citySelection {
+	margin: 0 auto;
+	text-align: center;
+	transform: translateY(20px);
+}
+
+#mapContainer {
+	margin: 0 auto;
+	text-align: center;
+}
+
+#topUsers {
+	float: right;
+	transform: translate(170px, 12px);
+}
+
+.tableElement {
+	width: 200px;
+	height: 40px;
+	font-size: 13px;
+	line-height: 40px;
+	background-color: white;
+	border-bottom: 1px solid #c41200;
+	list-style-type: none;
+	color: #c41200;
+	font-weight: normal;
+}
+
+.tableElement:hover {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+#topSelection {
+	float: right;
+	transform: translate(-30px, -15px);
+	width: 205px;
+	height: 35px;
+	border-bottom: 1px solid #c41200;
+}
+
+.selectType {
+	width: 99px;
+	height: 30px;
+	background-color: white;
+	margin: 0 auto;
+	text-align: center;
+	line-height: 30px;
+	font-size: 13px;
+	display: inline-block;	
+}
+
+.selectedUser {
+	font-weight: 600;
+}
+
+#selectTopUsers {
+	border-right: 1px solid #c41200;
+}
+
