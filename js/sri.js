@@ -43,7 +43,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   var topUsers = getTopUsersByCity();
   showTopUsers(topUsers);
   //poppy();
-
+  getTopBusinesses();
 
 
   // console.log(userLocations)
@@ -312,6 +312,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
   **/
 
+
+
   function buildUserLocationsObj(){
     for (var i = 0; i < 10000; i++){
       var biz_id = tipData[i]["business_id"];
@@ -351,6 +353,23 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     else {
       userTipPathObj[user_id].push({"lat": lat, "long": long, "date": date, "text": text});
     }
+  }
+
+  function getTopBusinesses(){
+    var temp = [];
+    var best_biz = [];
+    var biz_d = dataToggle[indexOfCity]
+
+    for (var i =0; i < biz_d.length; i++){
+      temp.push(Number(biz_d[i]['review_count']));
+    }
+
+    for (var i = 0; i < 10; i++){
+      var ind1 = temp.indexOf(Math.max.apply(Math, temp));
+      best_biz.push(biz_d[ind1]);
+      temp.splice(ind1, 1);
+    }
+    console.log(best_biz);
   }
 
   function getTopUsersByCity(){
