@@ -41,11 +41,11 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   //businessPics();
   buildUserLocationsObj();
   var topUsers = getTopUsersByCity();
-  showTopUsers(topUsers);
+  showTop(topUsers, "user_id");
   //poppy();
   var topBusinesses = getTopBusinesses();
-
-  console.log(topBusinesses)
+  //showTopBusinesses(topBusinesses);
+  //console.log(topBusinesses)
 
   /* JQUERY FUNCTIONS */
   $('#ratingFilter').on('click', function(){
@@ -66,17 +66,20 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   $('.cityToggle').on('click', function(){
     $(".citySelected").removeClass("citySelected");
     $(this).addClass("citySelected")
-
     indexOfCity = this.id;
     currentCity = cityToggle[indexOfCity];
+    //console.log(indexOfCity);
+    //console.log(currentCity)
     data = dataToggle[indexOfCity];
    // $('#cityTitle').html(currentCity);
 
     $('#avgRatingForSelection').html('');
     map.removeLayer(markers);
     drawMap(data, currentCity);
+    topUsers = getTopUsersByCity();
     $("#topUsers").empty();
-    showTopUsers(topUsers);
+    //showTopUsers(topUsers);
+    showTop(topUsers, "user_")
   })
 
   $('#topUsers > li').on('click', function(){
@@ -89,6 +92,19 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     map.removeLayer(markers);
     showTipLocationAnimation(this.id, userTipPathObj);
   })
+
+  $('#selectTopBiz').on('click', function(){
+    $("#topUsers").empty();
+    topBusinesses = getTopBusinesses();
+    showTop(topBusinesses, "business_id");
+  })
+
+  $('#selectTopUsers').on('click', function(){
+    $("#topUsers").empty();
+    topUsers = getTopUsersByCity();
+    showTop(topUsers, "user_id");
+  })
+
 
   /* DATA ANALYSIS FUNCTIONS */
   function drawMap(data, currentCity){
@@ -430,7 +446,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       temp = [];
     }
 
-    return topUsersInEachCity;
+    return topUsersInEachCity[indexOfCity];
   }
 
   function findBusinessStateFromId(biz_id, businessData){
@@ -453,11 +469,34 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     return [];
   }
 
-  function showTopUsers(topUsers){
-    var arr = topUsers[indexOfCity];
+  // function showTopUsers(topUsers){
+  //   var arr = topUsers[indexOfCity];
+  //   for (var i = 0; i < arr.length; i++){
+  //     var node = document.createElement("LI");
+  //     node.setAttribute("id", arr[i]["user_id"]);
+  //     node.setAttribute("class", "tableElement");
+  //     var textnode = document.createTextNode(i+1 + " " + arr[i]["name"]);
+  //     node.appendChild(textnode);
+  //     document.getElementById("topUsers").appendChild(node);
+  //   }
+  // }
+
+  // function showTopBusinesses(topBusinesses){
+  //   var arr = topBusinesses;
+  //   for (var i = 0; i < arr.length; i++){
+  //     var node = document.createElement("LI");
+  //     node.setAttribute("id", arr[i]["business_id"]);
+  //     node.setAttribute("class", "tableElement");
+  //     var textnode = document.createTextNode(i+1 + " " + arr[i]["name"]);
+  //     node.appendChild(textnode);
+  //     document.getElementById("topUsers").appendChild(node);
+  //   }
+  // }
+
+  function showTop(arr, id){
     for (var i = 0; i < arr.length; i++){
       var node = document.createElement("LI");
-      node.setAttribute("id", arr[i]["user_id"]);
+      node.setAttribute("id", arr[i][id]);
       node.setAttribute("class", "tableElement");
       var textnode = document.createTextNode(i+1 + " " + arr[i]["name"]);
       node.appendChild(textnode);
