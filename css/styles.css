@@ -128,8 +128,46 @@ body {
   .popup .cycle a.prev { float:left; }
   .popup .cycle a.next { float:right; }
 
-#box {
-	width: 100px;
-	height: 100px;
-	background-color: red;
+#businessModal {
+	position: absolute;
+	width: 80%;
+	height: 80%;
+	background-color: white;
+	z-index: 9999;
+	box-shadow: 20px 20px 100px #888888;
+	margin: 0 auto;
+	text-align: center;
+	transform: translate(120px, -20px);
+	border-radius: 2px;
+	display: none;
+}
+
+#bizTitle {
+	width: 90%;
+	height: 60px;
+	font-size: 30px;
+	font-weight: 600;
+	color: #c41200;
+	border-bottom: 1px solid #c41200;
+
+	transform: translateX(5%);
+}
+
+#bizTitle > p {  
+	margin: 0 auto;
+	margin-top: 20px;
+	float: left;
+}
+
+#pieChart {
+	height: 300px;
+	width: 300px;
+}
+
+#close {
+	float: right;
+}
+
+#close:hover {
+	cursor: pointer;
 }

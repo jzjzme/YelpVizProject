@@ -6,6 +6,7 @@
 		<script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 		<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="js/d3pie.min.js"></script>'
 		<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
 		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
 		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
@@ -18,14 +19,21 @@
 	</head>
 	<body>
 		<div id="title"> Yelp Data Visualization</div>
+		<div id="overlay">
+			<div id="businessModal"> 
+				<div id="bizTitle"> <p> Business Title </p> </div>
+				<div id="close"> X </div>
+				<div id="pieChart"></div>
+			</div>
+		</div>
 		<div id="mapContainer">
 			<div id='map'></div>
 		</div>
 		<div id="citySelection">
-			<div class="cityToggle small citySelected" id="0">Urbana-Champaign, IL</div>
+			<div class="cityToggle small" id="0">Urbana-Champaign, IL</div>
 			<div class="cityToggle" id="1">Phoenix, AZ</div>
 			<div class="cityToggle" id="2">Madison, WI</div>
-			<div class="cityToggle" id="3">Pittsburgh, PA</div>
+			<div class="cityToggle citySelected" id="3">Pittsburgh, PA</div>
 			<div class="cityToggle" id="4">Charlotte, NC</div>
 		</div>
 
@@ -39,9 +47,8 @@
 		<button id="ratingFilter">show me!</button> <br>
 		<div id="avgRatingForSelection"></div>
 		<ul id='marker-list'></ul>
-
-
-		<script>
-		</script>
 	</body>
+	<script>
+	// var pie = new d3pie("pieChart", {"header":{"title":{"text":"Types of Reviews","fontSize":24,"font":"open sans"},"subtitle":{"text":"A Top 10 Business","color":"#999999","fontSize":12,"font":"open sans"},"location":"pie-center","titleSubtitlePadding":9},"footer":{"color":"#999999","fontSize":10,"font":"open sans","location":"bottom-left"},"size":{"canvasWidth":550,"pieInnerRadius":"62%","pieOuterRadius":"90%"},"data":{"sortOrder":"value-desc","content":[{"label":"Funny ","value":67706,"color":"#ff0016"},{"label":"Cool ","value":36344,"color":"#ffbf00"},{"label":"Useful","value":32170,"color":"#1aee75"}]},"labels":{"outer":{"pieDistance":32},"inner":{"hideWhenLessThanPercentage":3},"mainLabel":{"fontSize":11},"percentage":{"color":"#ffffff","decimalPlaces":0},"value":{"color":"#adadad","fontSize":11},"lines":{"enabled":true},"truncation":{"enabled":true}},"effects":{"pullOutSegmentOnClick":{"effect":"linear","speed":400,"size":8}},"misc":{"gradient":{"enabled":true,"percentage":100}}});
+	</script>
 </html>

@@ -25,7 +25,7 @@ body {
 
 </style>
 <body>
-<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="d3.min.js"></script>
 <script>
 
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -49,7 +49,9 @@ var yAxis = d3.svg.axis()
     .orient("left");
 
 var line = d3.svg.line()
-    .x(function(d) { return x(d.date); })
+    .x(function(d) { 
+      return x(d.date); 
+    })
     .y(function(d) { return y(d.close); });
 
 var svg = d3.select("body").append("svg")
@@ -58,10 +60,14 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("data.tsv", type, function(error, data) {
-  if (error) throw error;
+//d3.tsv("data.tsv", type, function(error, data) {
+  data = [{'date': '24-Apr-07', 'close': '2'}, {'date': '26-Apr-07', 'close': '4'}, {'date': '30-Apr-07', 'close': '3'}];
+  //if (error) throw error;
 
-  x.domain(d3.extent(data, function(d) { return d.date; }));
+  x.domain(d3.extent(data, function(d) { 
+    return d.date; 
+    console.log(d.date);
+  }));
   y.domain(d3.extent(data, function(d) { return d.close; }));
 
   svg.append("g")
@@ -83,7 +89,7 @@ d3.tsv("data.tsv", type, function(error, data) {
       .datum(data)
       .attr("class", "line")
       .attr("d", line);
-});
+//});
 
 function type(d) {
   d.date = formatDate.parse(d.date);

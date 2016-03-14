@@ -1,6 +1,7 @@
 
 d3.csv('data/tip_data/tip.csv', function(err, tipData){
 d3.csv('data/review_data/short_reviews.csv', function(err, reviewData){
+d3.csv('data/checkin_data/checkin.csv', function(err, checkinData){
 d3.csv('data/user_data/new_user.csv', function(err, userData){
 d3.csv("data/biz_data/WI_Business_Data.csv", function(err, dataWI) {
 d3.csv("data/biz_data/AZ_Business_Data.csv", function(err, dataAZ) {
@@ -31,7 +32,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     userLocations[state] = {};
   }
   var userTipPathObj = {};
-  var indexOfCity = 0;
+  var indexOfCity = 3;
   var currentCity = cityToggle[indexOfCity];
   var data = dataToggle[indexOfCity];
   $('#cityTitle').html(currentCity);
@@ -43,8 +44,14 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   showTop(topUsers, "user_id");
   var topBusinesses = getTopBusinesses();
 
-  var ratingObj = {};
-  //findRatingOverTime(ratingObj);
+  var ratingTimeObj = {};
+  var ratingPersonalityObj = {};
+  analyzeRating(ratingTimeObj, ratingPersonalityObj);
+
+  var checkinDataObj = {};
+  getCheckinData(checkinDataObj);
+
+  //console.log(reviewData[0]);
 
   /* JQUERY FUNCTIONS */
   $('#ratingFilter').on('click', function(){
@@ -101,6 +108,10 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     $("#topUsers").empty();
     topUsers = getTopUsersByCity();
     showTop(topUsers, "user_id");
+  })
+
+  $('#close').on('click', function(){
+    $('#businessModal').hide();
   })
 
   /* DATA ANALYSIS FUNCTIONS */
@@ -209,6 +220,16 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       var lat = Number(data[i]["latitude"]);
       var lng = Number(data[i]["longitude"]);
       var name = data[i]["name"];
+      var biz_id = data[i]["business_id"];
+
+      if (ratingPersonalityObj[biz_id] == undefined){
+        ratingPersonalityObj[biz_id] = {
+          'cool': 100,
+          'funny': 100,
+          'useful': 100
+        }
+      }
+
       var obj = {
           type: 'Feature',
           "geometry": { "type": "Point", "coordinates": [lng, lat]},
@@ -223,46 +244,121 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
                 ['http://i.imgur.com/O6QEpBs.jpg','this is slide 1'],
                 ['http://i.imgur.com/O6QEpBs.jpg','this is slide 2'],
                 ['http://i.imgur.com/O6QEpBs.jpg','this is slide 3']
-              ] 
+              ],
+              'personalities': {
+                'cool': ratingPersonalityObj[biz_id]["cool"],
+                'funny': ratingPersonalityObj[biz_id]["funny"],
+                'useful': ratingPersonalityObj[biz_id]["useful"]
+              } 
           }
       };
 
       geoJson.push(obj);
     }
 
-    // Add custom popup html to each marker.
     myLayer.on('layeradd', function(e) {
         var marker = e.layer;
         var feature = marker.feature;
         var images = feature.properties.images
         var slideshowContent = '';
+        
+        marker.on('click', function(e){
+          console.log("clicked the marker")
+          console.log(feature.properties.title)
 
-        for(var i = 0; i < images.length; i++) {
-            var img = images[i];
+          $('#businessModal').fadeTo(.2, 1.0, function(){
+            $('#bizTitle').html(feature.properties.title);
+          })
 
-            slideshowContent += '<div class="image' + (i === 0 ? ' active' : '') + '">' +
-                                  '<div id="box"><div/>' +
-                                  '<div class="caption">' + img[1] + '</div>' +
-                                '</div>';
-        }
+          var pie = new d3pie("pieChart", {
+            "header": {
+              "title": {
+                "text": "Quality of Reviews",
+                "color": "#c02323",
+                "fontSize": 15,
+                "font": "open sans"
+              },
+              "subtitle": {
+                "color": "#999999",
+                "fontSize": 10,
+                "font": "open sans"
+              },
+              "titleSubtitlePadding": 9
+            },
+            "footer": {
+              "color": "#999999",
+              "fontSize": 10,
+              "font": "open sans",
+              "location": "bottom-left"
+            },
+            "size": {
+              "canvasWidth": 300,
+              "pieInnerRadius": "54%",
+              "pieOuterRadius": "80%"
+            },
+            "data": {
+              "sortOrder": "value-desc",
+              "content": [
+                {
+                  "label": "Cool Vote",
+                  "value": feature.properties.personalities.cool,
+                  "color": "#3c96d0"
+                },
+                {
+                  "label": "Funny Vote",
+                  "value": feature.properties.personalities.funny,
+                  "color": "#6affce"
+                },
+                {
+                  "label": "Useful Vote",
+                  "value": feature.properties.personalities.useful,
+                  "color": "#5e1fa6"
+                }
+              ]
+            },
+            "labels": {
+              "outer": {
+                "pieDistance": 32
+              },
+              "inner": {
+                "hideWhenLessThanPercentage": 0
+              },
+              "mainLabel": {
+                "fontSize": 11
+              },
+              "percentage": {
+                "color": "#ffffff",
+                "decimalPlaces": 0
+              },
+              "value": {
+                "color": "#adadad",
+                "fontSize": 11
+              },
+              "lines": {
+                "enabled": true
+              },
+              "truncation": {
+                "enabled": true
+              }
+            },
+            "effects": {
+              "pullOutSegmentOnClick": {
+                "effect": "linear",
+                "speed": 400,
+                "size": 8
+              }
+            },
+            "misc": {
+              "gradient": {
+                "enabled": true,
+                "percentage": 100
+              }
+            },
+            "callbacks": {}
+          });
 
-        // Create custom popup content
-        var popupContent =  '<div id="' + feature.properties.id + '" class="popup">' +
-                                '<h2>' + feature.properties.title + '</h2>' +
-                                '<div class="slideshow">' +
-                                    slideshowContent +
-                                '</div>' +
-                                '<div class="cycle">' +
-                                    '<a href="#" class="prev">&laquo; Previous</a>' +
-                                    '<a href="#" class="next">Next &raquo;</a>' +
-                                '</div>'
-                            '</div>';
 
-        // http://leafletjs.com/reference.html#popup
-        marker.bindPopup(popupContent,{
-            closeButton: false,
-            minWidth: 320
-        });
+        })
     });
 
     // Add features to the map
@@ -483,11 +579,68 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     }
   }
 
-  // function findRatingOverTime(ratingObj){
-  //   for (var i = 0; i < reviewData; i++){
-  //     ratingObj[review_data[i]["business_id"]] = 
-  //   }
-  // }
+  function analyzeRating(ratingTimeObj, ratingPersonalityObj){
+    for (var i = 0; i < reviewData.length; i++){
+      var biz_id = reviewData[i]["business_id"];
+      var date = reviewData[i]["date"];
+      if (date[1] == '/'){
+        date = reviewData[i]["date"].substring(0, 1)
+      } else {
+        date = reviewData[i]["date"].substring(0, 2)
+      }
+
+      var stars = Number(reviewData[i]["stars"]);
+
+      var cool = Number(reviewData[i]["votes_cool"])
+      var funny = Number(reviewData[i]["votes_funny"])
+      var useful = Number(reviewData[i]["votes_useful"])
+
+      //business was never reached
+      if (ratingTimeObj[biz_id] == undefined){
+        ratingTimeObj[biz_id] = {};
+        ratingPersonalityObj[biz_id] = {
+          cool: 0,
+          funny: 0,
+          useful: 0
+        };
+      }
+
+      if (ratingTimeObj[biz_id][date] == undefined){
+        ratingTimeObj[biz_id][date] = [stars, 1];
+      }
+      else {
+        var count = ratingTimeObj[biz_id][date][1] + 1;
+        var avgStars = (ratingTimeObj[biz_id][date][0]*(count-1) + stars)/count;
+        ratingTimeObj[biz_id][date] = [avgStars.toFixed(2), count]
+      }
+
+      ratingPersonalityObj[biz_id]["cool"] += cool;
+      ratingPersonalityObj[biz_id]["funny"] += funny;
+      ratingPersonalityObj[biz_id]["useful"] += useful;
+    }
+
+    console.log(ratingTimeObj["qMkIbQFrROSnPaQ7at85-w"]);
+  }
+
+  function getCheckinData(checkinDataObj){
+    for (var i = 0; i < checkinData.length; i++){
+      var biz_id = checkinData[i]["business_id"];
+      checkinDataObj[biz_id] = {};
+      for (var key in checkinData[i]){
+        if (key != 'type' && key != "business_id"){
+          var day = key[key.length-1];
+          var hour = key.substring(key.indexOf('.')+1, key.indexOf('-'))
+          var numCheckins = checkinData[i][key];
+          if (checkinDataObj[biz_id][day] == undefined){
+            checkinDataObj[biz_id][day] = {};
+          }
+          checkinDataObj[biz_id][day][hour] = numCheckins;
+        }
+      }
+    }
+
+    console.log(checkinDataObj);
+  }
 
 });
 });
@@ -498,6 +651,9 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 });
 });
 });
+});
+
+
 
 // AZ. 5kJYTUtFUJT24dWNs6eW8w
 // IL. TIPAxQKKs058vSURbfoBwA
