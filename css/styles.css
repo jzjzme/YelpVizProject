@@ -160,8 +160,26 @@ body {
 }
 
 #pieChart {
-	height: 400px;
-	width: 400px;
+	height: 200px;
+	width: 200px;
+	transform: translate(180px, 0);
+}
+
+#myChart {
+	height: 200px;
+	width: 300px;
+	transform: translate(50px, -150px);
+
+}
+
+#myCheckin {
+	height: 200px;
+	width: 300px;
+	transform: translate(50px, -120px);
+}
+
+#pieChart, #myChart, #myCheckin {
+	display: inline-block;
 }
 
 #close {
@@ -171,6 +189,7 @@ body {
 #close:hover {
 	cursor: pointer;
 }
+
 /*
 #lineGraph {
 	font-size: 12px;

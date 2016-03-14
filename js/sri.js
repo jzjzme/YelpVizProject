@@ -51,7 +51,10 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   var checkinDataObj = {};
   getCheckinData(checkinDataObj);
 
+  //console.log(checkinDataObj)
+
   //console.log(reviewData[0]);
+  var modalBusinessId;
 
   /* JQUERY FUNCTIONS */
   $('#ratingFilter').on('click', function(){
@@ -89,7 +92,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     $(".selectedUser").removeClass("selectedUser");
     $(this).addClass("selectedUser");
 
-    console.log(this);
+    //console.log(this);
 
     $('#avgRatingForSelection').html('');
     map.removeLayer(markers);
@@ -100,7 +103,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     $("#topUsers").empty();
     topBusinesses = getTopBusinesses();
     showTop(topBusinesses, "business_id");
-    console.log(topBusinesses)
+    //console.log(topBusinesses)
     addSlideShowToMap(topBusinesses);
   })
 
@@ -113,6 +116,19 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   $('#close').on('click', function(){
     $('#businessModal').hide();
   })
+
+  // $('#showPieChart').on('click', function(){
+  //   $('#myChart').empty();
+  //   $('#myChart').hide();
+
+  // })
+
+  // $('#showLineGraph').on('click', function(){
+  //   $('#pieChart').empty();
+  //   $('#pieChart').hide();
+  //   $('#myChart').show();
+  //   showLineGraph();
+  // })
 
   /* DATA ANALYSIS FUNCTIONS */
   function drawMap(data, currentCity){
@@ -249,7 +265,8 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
                 'cool': ratingPersonalityObj[biz_id]["cool"],
                 'funny': ratingPersonalityObj[biz_id]["funny"],
                 'useful': ratingPersonalityObj[biz_id]["useful"]
-              } 
+              },
+              'business_id': biz_id
           }
       };
 
@@ -270,44 +287,24 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
           var funny = feature.properties.personalities.funny;
           var useful = feature.properties.personalities.useful;
 
-          console.log(feature.properties.title)
-          console.log(cool);
-          console.log(funny);
-          console.log(useful);
+          modalBusinessId = feature.properties.business_id;
 
           $('#businessModal').fadeTo(.2, 1.0, function(){
             $('#bizTitle').html(feature.properties.title);
           })
 
           $('#pieChart').empty();
-          showPieChart(cool, funny, useful);
+          $('#myChart').empty();
+          $('#myCheckin').empty();
 
+          showPieChart(cool, funny, useful);
+          showLineGraph();
+          showCheckinData();
         })
     });
 
     // Add features to the map
-    myLayer.setGeoJSON(geoJson);
-
-    // $('#map').on('click', '.popup .cycle a', function() {
-    //     var $slideshow = $('.slideshow'),
-    //         $newSlide;
-
-    //     if ($(this).hasClass('prev')) {
-    //         $newSlide = $slideshow.find('.active').prev();
-    //         if ($newSlide.index() < 0) {
-    //             $newSlide = $('.image').last();
-    //         }
-    //     } else {
-    //         $newSlide = $slideshow.find('.active').next();
-    //         if ($newSlide.index() < 0) {
-    //             $newSlide = $('.image').first();
-    //         }
-    //     }
-
-    //     $slideshow.find('.active').removeClass('active').hide();
-    //     $newSlide.addClass('active').show();
-    //     return false;
-    // });    
+    myLayer.setGeoJSON(geoJson); 
   }
 
   function showPieChart(cool, funny, useful){
@@ -400,77 +397,100 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
   }
 
   function showLineGraph(){
-    // Set the dimensions of the canvas / graph
-    var margin = {top: 30, right: 20, bottom: 30, left: 50},
-        width = 600 - margin.left - margin.right,
-        height = 270 - margin.top - margin.bottom;
-
-    // Parse the date / time
-    var parseDate = d3.time.format("%d-%b-%y").parse;
-
-    // Set the ranges
-    var x = d3.time.scale().range([0, width]);
-    var y = d3.scale.linear().range([height, 0]);
-
-    // Define the axes
-    var xAxis = d3.svg.axis().scale(x)
-        .orient("bottom").ticks(5);
-
-    var yAxis = d3.svg.axis().scale(y)
-        .orient("left").ticks(5);
-
-    // Define the line
-    var valueline = d3.svg.line()
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.close); });
-
-    // Adds the svg canvas
-    var svg = d3.select("#lineGraph")
-        .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-            .attr("transform",
-                  "translate(" + margin.left + "," + margin.top + ")");
-        
-    data = [
-    {
-        "date": "29-Oct-14",
-        "close": "4"
-    },
-    {
-        "date": "13-Feb-14",
-        "close": "6"
+    for (var i = 1; i < 13; i++){
+      if (ratingTimeObj[modalBusinessId][i] == undefined){
+        ratingTimeObj[modalBusinessId][i] = 0;
+      }
     }
-    ];
+    console.log("am i here")
+    //console.log(ratingTimeObj[modalBusinessId]);
 
-    data.forEach(function(d) {
-        d.date = parseDate(d.date);
-        d.close = +d.close;
-    });
+    var temp = [];
+    for (var i = 1; i < 13; i++){
+      temp.push(ratingTimeObj[modalBusinessId][i][0]);
+    }
 
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.close; })]);
+    var data = {
+        labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "Novemeber", "December"],
+        datasets: [
+            {
+                label: "Ratings by Month",
+                fillColor: "rgba(220,220,220,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#c41200",
+                pointHighlightFill: "#edb7b2",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: temp
+            }
+        ]
+    };
+    this.div = document.getElementById('myChart');
+    this.div.style.backgroundColor = 'white';
+    this.div.style.width = '400px';
+    this.div.style.height = '200px';
+    this.chartCanvas = document.createElement('canvas');
+    this.div.appendChild(this.chartCanvas);
+    this.chartCanvas.style.height = '200px';
+    this.chartCanvas.style.width = '400px';
+    this.chartCanvas.width = 400;
+    this.chartCanvas.height = 200;
+    this.ctx = this.chartCanvas.getContext('2d');
 
-    // Add the valueline path.
-    svg.append("path")
-        .attr("class", "line")
-        .attr("d", valueline(data));
+    //This will break it
+    //this.div.style.display = 'none';
+    this.chart = new Chart(this.ctx).Line(data);
+    this.div.style.display = 'block';
 
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+    setTimeout(function(){
+        this.div.style.display = 'block';
+    }.bind(this), 1000);
   }
 
+  function showCheckinData(){
 
+    var dayCounts = [0, 0, 0, 0, 0, 0, 0];
+    for (var i = 0; i < 7; i++){
+      for (var j = 0; j < 24; j++){
+        dayCounts[i] += Number(checkinDataObj[modalBusinessId][i][j]);
+      }
+    }
+
+    var data = {
+        labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        datasets: [{
+                label: "Checkins by Day of Week",
+                fillColor: "rgba(220,220,220,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#c41200",
+                pointHighlightFill: "#edb7b2",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: dayCounts
+            }]
+    };
+
+    this.div = document.getElementById('myCheckin');
+    this.div.style.backgroundColor = 'white';
+    this.div.style.width = '400px';
+    this.div.style.height = '200px';
+    this.chartCanvas = document.createElement('canvas');
+    this.div.appendChild(this.chartCanvas);
+    this.chartCanvas.style.height = '200px';
+    this.chartCanvas.style.width = '400px';
+    this.chartCanvas.width = 400;
+    this.chartCanvas.height = 200;
+    this.ctx = this.chartCanvas.getContext('2d');
+
+    //This will break it
+    //this.div.style.display = 'none';
+    this.chart = new Chart(this.ctx).Bar(data);
+    this.div.style.display = 'block';
+
+    setTimeout(function(){
+        this.div.style.display = 'block';
+    }.bind(this), 1000);
+  }
 
   function showTipLocationAnimation(user_id, userTipPathObj){
 
@@ -697,7 +717,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       else {
         var count = ratingTimeObj[biz_id][date][1] + 1;
         var avgStars = (ratingTimeObj[biz_id][date][0]*(count-1) + stars)/count;
-        ratingTimeObj[biz_id][date] = [avgStars.toFixed(2), count]
+        ratingTimeObj[biz_id][date] = [Number(avgStars.toFixed(2)), count]
       }
 
       ratingPersonalityObj[biz_id]["cool"] += cool;
@@ -705,7 +725,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
       ratingPersonalityObj[biz_id]["useful"] += useful;
     }
 
-    console.log(ratingTimeObj["qMkIbQFrROSnPaQ7at85-w"]);
+    //console.log(ratingTimeObj);
   }
 
   function getCheckinData(checkinDataObj){
@@ -722,9 +742,9 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
           }
           checkinDataObj[biz_id][day][hour] = numCheckins;
         }
-      }
+      } 
     }
-
+    //console.log("hello")
     console.log(checkinDataObj);
   }
 
