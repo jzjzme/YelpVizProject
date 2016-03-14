@@ -19,7 +19,9 @@
  		<link href='css/styles.css' rel='stylesheet'/>
 	</head>
 	<body>
-		<div id="title"> Yelp Data Visualization</div>
+		<div id="background">
+			<div id="title"> Yelp Data Visualization </div>
+		</div>
 		<div id="overlay">
 			<div id="businessModal"> 
 				<div id="bizTitle"> <p> Business Title </p> </div>
@@ -46,8 +48,10 @@
 		</div>
 		<ol id="topUsers"></ol>
 
-		<input id="ratingInput" placeholder="minimum stars"></input>
-		<button id="ratingFilter">show me!</button> <br>
+		<input id="ratingInput" placeholder="minimum star filter"></input> <br>
+		<div id="ratingFilter">show me!</div> <br>
+		<div id="showAvg"></div>
+
 		<div id="avgRatingForSelection"></div>
 		<ul id='marker-list'></ul>
 	</body>

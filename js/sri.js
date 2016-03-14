@@ -117,19 +117,6 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     $('#businessModal').hide();
   })
 
-  // $('#showPieChart').on('click', function(){
-  //   $('#myChart').empty();
-  //   $('#myChart').hide();
-
-  // })
-
-  // $('#showLineGraph').on('click', function(){
-  //   $('#pieChart').empty();
-  //   $('#pieChart').hide();
-  //   $('#myChart').show();
-  //   showLineGraph();
-  // })
-
   /* DATA ANALYSIS FUNCTIONS */
   function drawMap(data, currentCity){
 
@@ -154,7 +141,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         var lat = data[i]["latitude"];
         var long = data[i]["longitude"];
 
-        var title = data[i]["name"] + data[i]["stars"];
+        var title = data[i]["name"] + " - " + data[i]["stars"] + " Stars";
         var marker = L.marker(new L.LatLng(lat, long), {
             icon: L.mapbox.marker.icon({'marker-color': '0044FF'}),
             title: title
@@ -201,7 +188,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
 
       var avgStars = getAvgStarByArea(data, minLat, maxLat, minLong, maxLong);
 
-      $('#avgRatingForSelection').html(avgStars);
+      $('#showAvg').html('Average Rating: ' + avgStars.toFixed(2));
 
       featureGroup.clearLayers();
       featureGroup.addLayer(e.layer);
@@ -252,7 +239,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
           "properties": {
               'title': name,
               'marker-color': '#3c4e5a',
-              'marker-symbol': 'monument',
+              'marker-symbol': 'restaurant',
               'marker-size': 'large',
 
               // Store the image url and caption in an array.
@@ -311,7 +298,7 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     var pie = new d3pie("pieChart", {
       "header": {
         "title": {
-          "text": "Quality of Reviews",
+          "text": "",
           "color": "#c02323",
           "fontSize": 15,
           "font": "open sans"
