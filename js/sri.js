@@ -261,102 +261,26 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
         var feature = marker.feature;
         var images = feature.properties.images
         var slideshowContent = '';
-        
+    
         marker.on('click', function(e){
-          console.log("clicked the marker")
+
+          var feature = marker.feature;
+
+          var cool = feature.properties.personalities.cool;
+          var funny = feature.properties.personalities.funny;
+          var useful = feature.properties.personalities.useful;
+
           console.log(feature.properties.title)
+          console.log(cool);
+          console.log(funny);
+          console.log(useful);
 
           $('#businessModal').fadeTo(.2, 1.0, function(){
             $('#bizTitle').html(feature.properties.title);
           })
 
-          var pie = new d3pie("pieChart", {
-            "header": {
-              "title": {
-                "text": "Quality of Reviews",
-                "color": "#c02323",
-                "fontSize": 15,
-                "font": "open sans"
-              },
-              "subtitle": {
-                "color": "#999999",
-                "fontSize": 10,
-                "font": "open sans"
-              },
-              "titleSubtitlePadding": 9
-            },
-            "footer": {
-              "color": "#999999",
-              "fontSize": 10,
-              "font": "open sans",
-              "location": "bottom-left"
-            },
-            "size": {
-              "canvasWidth": 300,
-              "pieInnerRadius": "54%",
-              "pieOuterRadius": "80%"
-            },
-            "data": {
-              "sortOrder": "value-desc",
-              "content": [
-                {
-                  "label": "Cool Vote",
-                  "value": feature.properties.personalities.cool,
-                  "color": "#3c96d0"
-                },
-                {
-                  "label": "Funny Vote",
-                  "value": feature.properties.personalities.funny,
-                  "color": "#6affce"
-                },
-                {
-                  "label": "Useful Vote",
-                  "value": feature.properties.personalities.useful,
-                  "color": "#5e1fa6"
-                }
-              ]
-            },
-            "labels": {
-              "outer": {
-                "pieDistance": 32
-              },
-              "inner": {
-                "hideWhenLessThanPercentage": 0
-              },
-              "mainLabel": {
-                "fontSize": 11
-              },
-              "percentage": {
-                "color": "#ffffff",
-                "decimalPlaces": 0
-              },
-              "value": {
-                "color": "#adadad",
-                "fontSize": 11
-              },
-              "lines": {
-                "enabled": true
-              },
-              "truncation": {
-                "enabled": true
-              }
-            },
-            "effects": {
-              "pullOutSegmentOnClick": {
-                "effect": "linear",
-                "speed": 400,
-                "size": 8
-              }
-            },
-            "misc": {
-              "gradient": {
-                "enabled": true,
-                "percentage": 100
-              }
-            },
-            "callbacks": {}
-          });
-
+          $('#pieChart').empty();
+          showPieChart(cool, funny, useful);
 
         })
     });
@@ -364,27 +288,189 @@ d3.csv("data/biz_data/NC_Business_Data.csv", function(err, dataNC) {
     // Add features to the map
     myLayer.setGeoJSON(geoJson);
 
-    $('#map').on('click', '.popup .cycle a', function() {
-        var $slideshow = $('.slideshow'),
-            $newSlide;
+    // $('#map').on('click', '.popup .cycle a', function() {
+    //     var $slideshow = $('.slideshow'),
+    //         $newSlide;
 
-        if ($(this).hasClass('prev')) {
-            $newSlide = $slideshow.find('.active').prev();
-            if ($newSlide.index() < 0) {
-                $newSlide = $('.image').last();
-            }
-        } else {
-            $newSlide = $slideshow.find('.active').next();
-            if ($newSlide.index() < 0) {
-                $newSlide = $('.image').first();
-            }
+    //     if ($(this).hasClass('prev')) {
+    //         $newSlide = $slideshow.find('.active').prev();
+    //         if ($newSlide.index() < 0) {
+    //             $newSlide = $('.image').last();
+    //         }
+    //     } else {
+    //         $newSlide = $slideshow.find('.active').next();
+    //         if ($newSlide.index() < 0) {
+    //             $newSlide = $('.image').first();
+    //         }
+    //     }
+
+    //     $slideshow.find('.active').removeClass('active').hide();
+    //     $newSlide.addClass('active').show();
+    //     return false;
+    // });    
+  }
+
+  function showPieChart(cool, funny, useful){
+    var pie = new d3pie("pieChart", {
+      "header": {
+        "title": {
+          "text": "Quality of Reviews",
+          "color": "#c02323",
+          "fontSize": 15,
+          "font": "open sans"
+        },
+        "subtitle": {
+          "color": "#999999",
+          "fontSize": 10,
+          "font": "open sans"
+        },
+        "titleSubtitlePadding": 9
+      },
+      "footer": {
+        "color": "#999999",
+        "fontSize": 10,
+        "font": "open sans",
+        "location": "bottom-left"
+      },
+      "size": {
+        "canvasWidth": 300,
+        "pieInnerRadius": "54%",
+        "pieOuterRadius": "80%"
+      },
+      "data": {
+        "sortOrder": "value-desc",
+        "content": [
+          {
+            "label": "Cool Vote",
+            "value": cool,
+            "color": "#3c96d0"
+          },
+          {
+            "label": "Funny Vote",
+            "value": funny,
+            "color": "#6affce"
+          },
+          {
+            "label": "Useful Vote",
+            "value": useful,
+            "color": "#5e1fa6"
+          }
+        ]
+      },
+      "labels": {
+        "outer": {
+          "pieDistance": 32
+        },
+        "inner": {
+          "hideWhenLessThanPercentage": 0
+        },
+        "mainLabel": {
+          "fontSize": 11
+        },
+        "percentage": {
+          "color": "#ffffff",
+          "decimalPlaces": 0
+        },
+        "value": {
+          "color": "#adadad",
+          "fontSize": 11
+        },
+        "lines": {
+          "enabled": true
+        },
+        "truncation": {
+          "enabled": true
         }
-
-        $slideshow.find('.active').removeClass('active').hide();
-        $newSlide.addClass('active').show();
-        return false;
+      },
+      "effects": {
+        "pullOutSegmentOnClick": {
+          "effect": "linear",
+          "speed": 400,
+          "size": 8
+        }
+      },
+      "misc": {
+        "gradient": {
+          "enabled": true,
+          "percentage": 100
+        }
+      },
+      "callbacks": {}
     });
   }
+
+  function showLineGraph(){
+    // Set the dimensions of the canvas / graph
+    var margin = {top: 30, right: 20, bottom: 30, left: 50},
+        width = 600 - margin.left - margin.right,
+        height = 270 - margin.top - margin.bottom;
+
+    // Parse the date / time
+    var parseDate = d3.time.format("%d-%b-%y").parse;
+
+    // Set the ranges
+    var x = d3.time.scale().range([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+
+    // Define the axes
+    var xAxis = d3.svg.axis().scale(x)
+        .orient("bottom").ticks(5);
+
+    var yAxis = d3.svg.axis().scale(y)
+        .orient("left").ticks(5);
+
+    // Define the line
+    var valueline = d3.svg.line()
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.close); });
+
+    // Adds the svg canvas
+    var svg = d3.select("#lineGraph")
+        .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+        
+    data = [
+    {
+        "date": "29-Oct-14",
+        "close": "4"
+    },
+    {
+        "date": "13-Feb-14",
+        "close": "6"
+    }
+    ];
+
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.close = +d.close;
+    });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.close; })]);
+
+    // Add the valueline path.
+    svg.append("path")
+        .attr("class", "line")
+        .attr("d", valueline(data));
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+  }
+
+
 
   function showTipLocationAnimation(user_id, userTipPathObj){
 
